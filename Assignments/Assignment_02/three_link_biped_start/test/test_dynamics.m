@@ -58,5 +58,3 @@ error_energy_loss = round(T_m_check + V_m_check - T_p_check - V_p_check ...
 fprintf('error_energy_loss: \n');
 disp(error_energy_loss);
 
-
-
