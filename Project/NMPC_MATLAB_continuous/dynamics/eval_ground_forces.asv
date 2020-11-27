@@ -1,0 +1,23 @@
+function [fl1, fl2] = eval_ground_forces(q, dq)
+    zl1 = eval_zl1(q);
+    zl2 = eval_zl2(q);
+    dxl1 = eval_dxl1(q, dq);
+    dzl1 = eval_dzl1(q, dq);
+    dxl2 = eval_dxl2(q, dq);
+    dzl2 = eval_dzl2(q, dq);
+    
+    alpha_k = 50;
+    alpha_d = 1000;
+    k = 1000;
+    dx = 10;
+    dz = 1;
+    
+    alpha_k = 50;
+    alpha_d = 1000;
+    k = 1000;
+    dx = 10;
+    dz = 1;
+    
+    fl1 = k*exp(-alpha_k*zl1)*[0;1] + (1/(1+exp(alpha_d*zl1))*[dxl1; dzl1]).*[dx;dz];
+    fl2 = k*exp(-alpha_k*zl2)*[0;1] + (1/(1+exp(alpha_d*zl2))*[dxl2; dzl2]).*[dx;dz];
+end
