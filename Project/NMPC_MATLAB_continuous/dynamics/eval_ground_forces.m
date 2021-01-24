@@ -24,6 +24,11 @@ function [fl1, fl2] = eval_ground_forces(q, dq)
     dx = 10000;
     dz = 1000;
 
-    fl1 = [0;min([k*exp(-alpha_k*zl1),1e8])] - (1/(1+exp(alpha_d*zl1))*[dxl1; dzl1]).*[dx;dz];
-    fl2 = [0;min([k*exp(-alpha_k*zl2),1e8])] - (1/(1+exp(alpha_d*zl2))*[dxl2; dzl2]).*[dx;dz];
+%     fl1 = [0;min([k*exp(-alpha_k*zl1),1e8])] - (1/(1+exp(alpha_d*zl1))*[dxl1; dzl1]).*[dx;dz];
+%     fl2 = [0;min([k*exp(-alpha_k*zl2),1e8])] - (1/(1+exp(alpha_d*zl2))*[dxl2; dzl2]).*[dx;dz];
+[m1, m2, m3, l1, l2, l3, g] = set_parameters;
+fg = (m1+m2+m3)*g;
+fg = 500;
+fl1 = [0; -dz*dzl1(zl1<=0)*fg] + [-dx*dxl1*(zl1<=0);0];
+fl2 = [0; -dz*dzl1(zl2<=0)*fg] + [-dx*dxl2*(zl2<=0);0];
 end

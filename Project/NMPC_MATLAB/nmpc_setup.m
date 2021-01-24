@@ -8,9 +8,11 @@ nx = 7;
 ny = 7;
 nu = 2;
 Ts = 0.01;
-p = 10;
+p = 15;
 f_optim = @(x,u) RK4_f(x,u,Ts,f);
-n_steps = 60;
+n_steps = 300;
+
+multiple_runs = true;
 
 ctrl = nlmpc(nx,ny,nu);
 ctrl.Ts = Ts;
@@ -23,8 +25,8 @@ ctrl.Model.IsContinuousTime = false;
 %ctrl.Optimization.CustomIneqConFcn =  @(X,U,e,data) constraints(X,U,e,data);
 
 %% set constraint
-max_angle = pi/2;
-max_input = 2;
+max_angle = pi/4;
+max_input = 30;
 ctrl.ManipulatedVariables(1).Min = -max_input;
 ctrl.ManipulatedVariables(1).Max = max_input;
 ctrl.ManipulatedVariables(2).Min = -max_input;
@@ -44,22 +46,29 @@ r0 = 0;
 x0 = [q0;dq0;r0]; 
 u0 = zeros(nu,1); 
 validateFcns(ctrl,x0,u0);
-[~,~,info] = nlmpcmove(ctrl,x0,u0);
 X = zeros(nx,n_steps+1);
 X(:,1) = x0;
 U = zeros(nu,n_steps+1);
 U(:,1) = u0;
 %%
-for k = 1:n_steps
-    [~,~,info] = nlmpcmove(ctrl,X(:,k),U(:,k));
-    X(:,k+1) = info.Xopt(2,:)';
-    U(:,k+1) = info.MVopt(2,:)';
+if multiple_runs 
+    for k = 1:n_steps
+        [~,~,info] = nlmpcmove(ctrl,X(:,k),U(:,k));
+        X(:,k+1) = info.Xopt(2,:)';
+        U(:,k+1) = info.MVopt(1,:)';
+    end
+else
+    [~,~,info] = nlmpcmove(ctrl,x0,u0);
+    X = info.Xopt';
 end
 %%
 close all
-% X = info.Xopt';
+x_h = zeros(1,length(X));
+z_h = zeros(1,length(X));
+dx_h = zeros(1,length(X));
 for k = 1:length(X)
-    visualize(X(1:3,k),[X(7,k);0]);
+    [x_h(k), z_h(k), dx_h(k), ~] = kin_hip(X(1:3,k),X(4:6,k));
+    visualize(X(1:3,k),[x_h(k) + X(7,k);0]);
     hold off
     pause(0.5);
 end

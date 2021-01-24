@@ -20,7 +20,7 @@ q_next = x_next(1:3);
 dq_next = x_next(4:6);
 [x_swf, z_swf, ~, ~] = kin_swf(q_next, dq_next);
 % if swf touches ground, perform impact map.
-if z_swf <= -0.0001
+if  z_swf + 0.01 * cos(q_next(1)) + 0.0001 <=0
     [q_impact_next, dq_impact_next] = impact(q_next, dq_next);
     x_next = [q_impact_next; dq_impact_next; x_next(7) + x_swf];
 end
